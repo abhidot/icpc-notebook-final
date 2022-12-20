@@ -24,11 +24,11 @@ namespace fwht{
                     T x = a[i + j];
                     T y = a[i + j + k];
                     if(inverse){
-                        a[i + j] = y - x;
-                        a[i + j +k] = x;
+                        a[i + j] = x;
+                        a[i + j +k] = y - x;
                     }
                     else{
-                        a[i + j] = y;
+                        a[i + j] = x;
                         a[i + j + k] = x + y;
                     }
                 }
