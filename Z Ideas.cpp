@@ -16,16 +16,6 @@ for (int s=m; ; s=(s-1)&m) {
  ... you can use s ...
  if (s==0)  break;}
 
-Sparse Table: 
-int st[MAXN][K];
-for (int i = 0; i < N; i++) st[i][0] = array[i];
-for (int j = 1; j <= K; j++)
-    for (int i = 0; i + (1 << j) <= N; i++)
-        st[i][j] = min(st[i][j-1], st[i + (1 << (j - 1))][j - 1]);
-To get minimum of a range:
-int j = log[R - L + 1];
-int minimum = min(st[L][j], st[R - (1 << j) + 1][j]);
-
 Divide and Conquer DP:
 Some dynamic programming problems have a recurrence of this form:
 dp(i,j)=mink≤j{dp(i−1,k)+C(k,j)} where C(k,j) is some cost function.
@@ -38,22 +28,6 @@ Let opt(i,j) be the value of k that minimizes the above expression.
 If opt(i,j)≤opt(i,j+1) for all i,j, then we can apply 
 divide-and-conquer DP. This known as the monotonicity condition. 
 The optimal "splitting point" for a fixed i increases as j increases.
-
-int n;
-long long C(int i, int j);
-vector<long long> dp_before(n), dp_cur(n);
-// compute dp_cur[l], ... dp_cur[r] (inclusive)
-void compute(int l, int r, int optl, int optr){
-    if (l > r)
-        return;
-    int mid = (l + r) >> 1;
-    pair<long long, int> best = {INF, -1};
-    for (int k = optl; k <= min(mid, optr); k++) {
-        best = min(best, {dp_before[k] + C(k, mid), k});}
-    dp_cur[mid] = best.first;
-    int opt = best.second;
-    compute(l, mid - 1, optl, opt);
-    compute(mid + 1, r, opt, optr);}
 
 Knuth Optimization:
 
@@ -272,69 +246,3 @@ for(int mask = 0; mask < (1<<N); ++mask){
 for(int i = 0; i<(1<<N); ++i) F[i] = A[i];
 for(int i = 0;i < N; ++i) for(int mask = 0; mask < (1<<N); ++mask){
 	if(mask & (1<<i)) F[mask] += F[mask^(1<<i)];}
-
-15 puzzle problem: existence of solution
-int a[16];
-for (int i=0; i<16; ++i)
-    cin >> a[i];
-int inv = 0;
-for (int i=0; i<16; ++i)
-    if (a[i])
-        for (int j=0; j<i; ++j)
-            if (a[j] > a[i])
-                ++inv;
-for (int i=0; i<16; ++i)
-    if (a[i] == 0)
-        inv += 1 + i / 4;
-puts ((inv & 1) ? "No Solution" : "Solution Exists");
-
-Largest repetition string: (s = x+x)
-vector<int> z_function(string const& s) {
-    int n = s.size();
-    vector<int> z(n);
-    for (int i = 1, l = 0, r = 0; i < n; i++) {
-        if (i <= r) z[i] = min(r-i+1, z[i-l]);
-        while (i + z[i] < n && s[z[i]] == s[i+z[i]])
-            z[i]++;
-        if (i + z[i] - 1 > r) {
-            l = i;
-            r = i + z[i] - 1;}}
-    return z;}
-int get_z(vector<int> const& z, int i) {
-    if (0 <= i && i < (int)z.size()) return z[i];
-    else return 0;}
-vector<pair<int, int>> repetitions;
-void convert_to_repetitions(int shift, bool left, int cntr, int l, int k1, int k2) {
-    for (int l1 = max(1, l - k2); l1 <= min(l, k1); l1++) {
-        if (left && l1 == l) break;
-        int l2 = l - l1;
-        int pos = shift + (left ? cntr - l1 : cntr - l - l1 + 1);
-        repetitions.emplace_back(pos, pos + 2*l - 1);}}
-void find_repetitions(string s, int shift = 0) {
-    int n = s.size();
-    if (n == 1)
-        return;
-    int nu = n / 2;
-    int nv = n - nu;
-    string u = s.substr(0, nu);
-    string v = s.substr(nu);
-    string ru(u.rbegin(), u.rend());
-    string rv(v.rbegin(), v.rend());
-    find_repetitions(u, shift);
-    find_repetitions(v, shift + nu);
-    vector<int> z1 = z_function(ru);
-    vector<int> z2 = z_function(v + '#' + u);
-    vector<int> z3 = z_function(ru + '#' + rv);
-    vector<int> z4 = z_function(v);
-    for (int cntr = 0; cntr < n; cntr++) {
-        int l, k1, k2;
-        if (cntr < nu) {
-            l = nu - cntr;
-            k1 = get_z(z1, nu - cntr);
-            k2 = get_z(z2, nv + 1 + cntr);
-        } else {
-            l = cntr - nu + 1;
-            k1 = get_z(z3, nu + 1 + nv - 1 - (cntr - nu));
-            k2 = get_z(z4, (cntr - nu) + 1);}
-        if (k1 + k2 >= l)
-            convert_to_repetitions(shift, cntr < nu, cntr, l, k1, k2);}}
