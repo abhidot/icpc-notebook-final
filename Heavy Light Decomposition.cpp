@@ -1,91 +1,138 @@
-struct SegTree{
- v32 T,lazy;
- int N,MX;
- void clear(int n,int mx){
-  N=n,MX=mx;
-  T.assign(4*N,0);
-  lazy.assign(4*N,0);}
- void build(int a[],int v,int tl,int tr){
-  if(tl==tr){
-   T[v]=a[tl];}else{
-   int tm=(tl+tr)>>1,lf=v<<1,rt=lf^1;;
-   build(a,lf,tl,tm);
-   build(a,rt,tm+1,tr);
-   T[v]=min(T[lf],T[rt]);}}
- void push(int v){
-  int lf=v<<1,rt=lf^1;
-  T[lf]=(T[lf]+lazy[v]);
-  lazy[lf]=(lazy[lf]+lazy[v]);
-  T[rt]=(T[rt]+lazy[v]);
-  lazy[rt]=(lazy[rt]+lazy[v]);
-  lazy[v]=0;}
- void update(int v,int tl,int tr,int l,int r,int val){
-  if(l>r or tl>r or tr<l) return;
-  if(l<=tl && tr<=r){
-   T[v]=T[v]+val;
-   lazy[v]=(lazy[v]+val);}else{
-   if(tl==tr) return;
-   push(v);
-   int tm=(tl+tr)>>1,lf=v<<1,rt=lf^1;;
-   update(lf,tl,tm,l,r,val);
-   update(rt,tm+1,tr,l,r,val);
-   T[v]=max(T[lf],T[rt]);}}
- int query(int v,int tl,int tr,int l,int r){
-  if(l>r) return MX;
-  if(l<=tl && tr<=r) return T[v];
-  push(v);
-  int tm=(tl+tr)>>1,lf=v<<1,rt=lf^1;
-  return max(query(lf,tl,tm,l,min(r,tm))
-  ,query(rt,tm+1,tr,max(l,tm+1),r));}
- int q(int l,int r){
-  return query(1,0,N-1,l,r);}
- void u(int l,int r,int val){
-  update(1,0,N-1,l,r,val);}
-} st;
-struct hld{
- int n,t;
- v32 sz,in,out,root,par,depth;
- vv32 g;
- SegTree tree;
- void dfs_sz(int v=0,int p=0){
-  sz[v]=1;
-  for(auto &u: g[v]){
-   if(u==p) continue;
-   dfs_sz(u,v);
-   sz[v]+=sz[u];
-   if(sz[u]>sz[g[v][0]]) swap(u, g[v][0]);}}
- void dfs_hld(int v=0,int p=0){
-     in[v]=t++;
-     par[v]=p;
-     depth[v]=depth[p]+1;
-     for(auto u: g[v]){
-      if(u==p) continue;
-         root[u]= (u==g[v][0] ? root[v]:u);
-         dfs_hld(u,v);}
-     out[v]=t;}
- void pre(vv32 &v){
-  g=v;n=v.size();t=0;
-  sz.assign(n,0);in.assign(n,0);out.assign(n,0);
-  root.assign(n,0);par.assign(n,0);depth.assign(n,0);
-  depth[0]=-1;
-  dfs_sz();dfs_hld();
-  tree.clear(n,-MOD);}
- template <class BinaryOperation>
- void processPath(int u,int v,BinaryOperation op){
-  for(;root[u]!=root[v];v=par[root[v]]){
-   if(depth[root[u]] > depth[root[v]]) swap(u,v);
-   op(in[root[v]],in[v]);  }
-  if(depth[u]>depth[v]) swap(u,v);
-  op(in[u],in[v]);}
- void modifyPath(int u,int v,const int &value){
-     processPath(u,v,[this,&value](int l,int r){tree.u(l,r,value);});} // [l,r]
-   void modifySubtree(int u,const int &value){
-    tree.u(in[u],out[u]-1,value);}
-   int queryPath(int u,int v){
-     int res=-MOD;
-     auto add=[](int &a,const int &b){a=max(a,b);};
-     processPath(u,v,[this,&res,&add](int l,int r){add(res,tree.q(l,r));});
-     return res;}
-   int querySubtree(int u){
-    return tree.q(in[u],out[u]-1);}
+using node = array<int,CNT> ;
+node comb(node a, node b) {
+    node c;
+    rep(i,0,CNT) c[i] = a[i] ^ b[i];
+    return c; 
+}
+// 0-indexed
+template<class T> struct basic_segment_tree { // comb(ID,b) = b
+    const T ID =  {0}; 
+    
+    int n; vector<T> seg;
+    void init(int _n) { 
+        n = _n; seg.assign(2*n,ID); 
+    }
+    void pull(int p) { 
+        seg[p] = comb(seg[2*p], seg[2*p + 1]); 
+    }
+    void upd(int p, T val) { // update val at position p
+        seg[p += n] = val; 
+        for (p /= 2; p; p /= 2) pull(p); 
+    }
+    T query(int l, int r) { // query on interval [l, r]
+        T ra = ID, rb = ID;
+        for (l += n, r += n+1; l < r; l /= 2, r /= 2) {
+            if (l&1) ra = comb(ra,seg[l++]);
+            if (r&1) rb = comb(seg[--r],rb);
+        }
+        return comb(ra,rb);
+    }
+};
+/**
+ * Codebuster_10 orz
+ * Description: Heavy-Light Decomposition, update value of verts 
+     * and query in path/subtree.
+ * Time: any tree path is split into O(log N) parts
+ * Source: 
+        http://codeforces.com/blog/entry/22072, https://codeforces.com/blog/entry/53170,
+        https://github.com/bqi343/USACO/blob/master/Implementations/content/graphs%20(12)/Trees%20(10)/HLD%20(10.3).h
+ * Verification: https://cses.fi/problemset/result/2321114/, https://www.spoj.com/status/QTREE,deepkamal/
+*/
+ 
+//  0-indexed
+template<bool VALS_IN_EDGES> struct HLD { 
+    int N;
+    int timer;
+    vector<vector<int>> adj;
+    vector<int> par, root, depth, sz,  pos;
+    vector<int> rpos; // rpos not used, but could be useful
+    
+    basic_segment_tree<node> tree; // segment tree 
+    
+    void init(int _N){
+        N = _N;
+        adj.assign(N,{});
+        par.assign(N,-1);
+        root.assign(N,-1);
+        depth.assign(N,-1);
+        sz.assign(N,-1);
+        pos.assign(N,-1);
+        tree.init(N);
+    }
+    
+    
+    void ae(int x, int y) { 
+        adj[x].push_back(y), adj[y].push_back(x); 
+    }
+    
+    void dfs_sz(int x) { 
+        sz[x] = 1; 
+        for(auto& y : adj[x]) {
+            par[y] = x; depth[y] = depth[x] + 1;
+            adj[y].erase(find(adj[y].begin(),adj[y].end(),x)); // remove parent from adj list
+            dfs_sz(y); 
+            sz[x] += sz[y];
+            if (sz[y] > sz[adj[x][0]]) swap(y,adj[x][0]); // store the heavy child at first vertex
+        }
+    }
+    
+    void dfs_hld(int x) {
+        pos[x] = timer++; rpos.push_back(x);
+        for(auto& y : adj[x]) {
+            root[y] = (y == adj[x][0] ? root[x] : y);
+            dfs_hld(y); 
+        }
+    }
+    
+    
+    
+    void gen(int R = 0) { 
+        par[R] = depth[R] = timer = 0; 
+        dfs_sz(R); 
+        root[R] = R;
+        dfs_hld(R); 
+    }
+    
+    int lca(int x, int y) {
+        for (; root[x] != root[y]; y = par[root[y]]){
+            if (depth[root[x]] > depth[root[y]]) swap(x,y);
+        }
+        return depth[x] < depth[y] ? x : y;
+    }
+    
+    int dist(int x, int y) { // # edges on path
+         return depth[x] + depth[y] - 2 * depth[lca(x,y)]; 
+    }
+    
+    
+    
+    void process_path(int x, int y, auto op) {
+        for (; root[x] != root[y]; y = par[root[y]]) {
+            if (depth[root[x]] > depth[root[y]]) swap(x,y);
+            op(pos[root[y]],pos[y]); 
+        }
+        if (depth[x] > depth[y]) swap(x,y);
+        op(pos[x]+VALS_IN_EDGES,pos[y]); 
+    }
+ 
+    void modify_path(int x, int y, node v) { 
+        process_path(x,y,[this,&v](int l, int r) {
+            assert(l == r); 
+            tree.upd(l,v); 
+        });
+    }
+ 
+    node query_path(int x, int y) { 
+        node res = {0}; 
+        process_path(x,y,[this,&res](int l, int r) { 
+            res = comb(res,tree.query(l,r)); 
+        });
+        return res; 
+    }
+     /*
+      * this is for range update.
+    void modify_subtree(int x, int v) { 
+        tree.upd(pos[x] + VALS_IN_EDGES, pos[x] + sz[x] - 1, v); 
+    }
+    */
 };
