@@ -1,26 +1,26 @@
-vector<set<int> > g;
-vector<int> par,sub;
-int dfs(int u,int p){
-	sub[u]=1;
-	for(auto &it: g[u]) if(it!=p) sub[u]+=dfs(it,u);
-	return sub[u];}
-int find_centroid(int u,int p,int n){
-	for(auto &it: g[u]){
-		if(it!=p && sub[it]>n/2){
-			return find_centroid(it,u,n);}}
-	return u;}
-void decompose(int u,int p=-1){
-	int n=dfs(u,p);
-	int centroid=find_centroid(u,p,n);
-	if(p==-1) p=centroid;
-	// Do stuff here for merges
-	// Recurse
-	par[centroid]=p;
-	for(auto &it: g[centroid]){
-		g[it].erase(centroid);
-		decompose(it,centroid);}
-	g[centroid].clear();}
-void reset(int n){
-	par.resize(n);
-	sub.resize(n);
-	g.assign(n,set<int>());}
+struct centroid {
+  vvi adj; int n; 
+  vi vis,par,sz;
+  void init(int s){
+    n=s; adj=vvi(n,vi());
+    vis=vi(n,0); par=sz=vi(n);}
+  void addEdge(int a,int b){
+    adj[a].pb(b); adj[b].pb(a);}
+  int findSize(int v,int p=-1){
+    if(vis[v]) return 0;
+    sz[v]=1;
+    for(int x:adj[v]){
+      if(x!=p) sz[v]+=findSize(x,v);}
+    return sz[v];}
+  int findCentroid(int v,int p,int n){
+    for(int x:adj[v])
+      if(x!=p && !vis[x] && sz[x]>n/2)
+        return findCentroid(x,v,n);
+    return v;}
+  void initCentroid(int v=0,int p=-1){
+    findSize(v);
+    int c=findCentroid(v,-1,sz[v]);
+    vis[c]=true; par[c] = p;
+    for(int x:adj[c])
+      if(!vis[x]) initCentroid(x,c);}
+};
