@@ -29,6 +29,37 @@ If opt(i,j)≤opt(i,j+1) for all i,j, then we can apply
 divide-and-conquer DP. This known as the monotonicity condition. 
 The optimal "splitting point" for a fixed i increases as j increases.
 
+int m, n;
+vector<long long> dp_before(n), dp_cur(n);
+long long C(int i, int j);
+
+// compute dp_cur[l], ... dp_cur[r] (inclusive)
+void compute(int l, int r, int optl, int optr) {
+    if (l > r) return;
+
+    int mid = (l + r) >> 1;
+    pair<long long, int> best = {LLONG_MAX, -1};
+
+    for (int k = optl; k <= min(mid, optr); k++) 
+        best = min(best, {(k ? dp_before[k - 1] : 0) + C(k, mid), k});
+
+    dp_cur[mid] = best.first;
+    int opt = best.second;
+    compute(l, mid - 1, optl, opt);
+    compute(mid + 1, r, opt, optr);
+}
+
+int solve() {
+    for (int i = 0; i < n; i++)
+        dp_before[i] = C(0, i);
+
+    for (int i = 1; i < m; i++) {
+        compute(0, n - 1, 0, n - 1);
+        dp_before = dp_cur;
+    }
+
+    return dp_before[n - 1];}
+
 Knuth Optimization:
 
 dp[i][j] = mini < k < j{dp[i][k] + dp[k][j]} + C[i][j]
@@ -122,18 +153,6 @@ void gen(int n, int k, int idx, bool rev) {
 void all_combinations(int n, int k) {
     ans.resize(n);gen(n, k, 0, false);}
 
-Simpsons formula for integration:
-
-const int N = 1000 * 1000; // number of steps (already multiplied by 2)
-double simpson_integration(double a, double b){
-    double h = (b - a) / N;
-    double s = f(a) + f(b); // a = x_0 and b = x_2n
-    for (int i = 1; i <= N - 1; ++i) { // Refer to final Simpson's formula
-        double x = a + h * i;
-        s += f(x) * ((i & 1) ? 4 : 2);}
-    s *= h / 3;
-    return s;}
-
 Picks theorem:
 
 Given a certain lattice polygon with non-zero area. We denote its area by S, the number of points with integer coordinates lying strictly inside the polygon by I and the number of points lying on polygon sides by B. Then, the Pick formula states: S=I + B/2 - 1 In particular, if the values of I and B for a polygon are given, the area can be calculated in O(1) without even knowing the vertices.
@@ -205,18 +224,6 @@ Fibonacci Identities:
 4. GCD(F_m,F_n) = F_{gcd(m,n)}
 5. F_{2k} = F_{k}(2F_{k+1}-F_{k}). F_{2k+1} = F^2_{k+1} +F^2_{k}
 6. n>=phi(m) => x^n = x^(phi(m)+n%phi(m)) mod m 
-
-Ternary Search
-double ternary_search(double l, double r) {
-    double eps = 1e-9;              //set the error limit here
-    while (r - l > eps) {
-        double m1 = l + (r - l) / 3;
-        double m2 = r - (r - l) / 3;
-        double f1 = f(m1);      //evaluates the function at m1
-        double f2 = f(m2);      //evaluates the function at m2
-        if (f1 < f2) l = m1;
-        else r = m2;}
-    return f(l);}                    //return the maximum of f(x) in [l, r]
 
 Counting labeled graphs:
 The total number of labelled graphs is G_n = 2^{n(n-1)/2}

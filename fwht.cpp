@@ -8,11 +8,7 @@ namespace fwht{
      T x = a[i + j];
      T y = a[i + j + k];
      a[i + j] = x + y;
-     a[i + j + k] = x - y;
-    }
-   }
-  }
- }
+     a[i + j + k] = x - y;}}}}
  template<typename T>
  void hadamard_or(vector<T> &a,bool inverse){
   int n = a.size();
@@ -27,12 +23,7 @@ namespace fwht{
      }
      else{
       a[i + j] = x;
-      a[i + j + k] = x + y;
-     }
-    }
-   }
-  }
- }
+      a[i + j + k] = x + y;}}}}}
  template<typename T>
  void hadamard_and(vector<T> &a,bool inverse){
   int n = a.size();
@@ -47,13 +38,7 @@ namespace fwht{
      }
      else{
       a[i + j] = x + y;
-      a[i + j + k] = y;   
-     }
-     
-    }
-   }
-  }
- }
+      a[i + j + k] = y;   }}}}}
  template<typename T>
  vector<T> multiply(vector<T> a,vector<T> b){
   int eq = (b==a);
@@ -74,7 +59,4 @@ namespace fwht{
    a[i]/=q;
   }
   return a;
- }
- 
- 
-}
+ }}
