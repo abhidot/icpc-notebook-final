@@ -7,7 +7,6 @@ node comb(node a, node b) {
 // 0-indexed
 template<class T> struct basic_segment_tree { // comb(ID,b) = b
     const T ID =  {0}; 
-    
     int n; vector<T> seg;
     void init(int _n) { 
         n = _n; seg.assign(2*n,ID); 
@@ -28,17 +27,6 @@ template<class T> struct basic_segment_tree { // comb(ID,b) = b
         return comb(ra,rb);
     }
 };
-/**
- * Codebuster_10 orz
- * Description: Heavy-Light Decomposition, update value of verts 
-     * and query in path/subtree.
- * Time: any tree path is split into O(log N) parts
- * Source: 
-        http://codeforces.com/blog/entry/22072, https://codeforces.com/blog/entry/53170,
-        https://github.com/bqi343/USACO/blob/master/Implementations/content/graphs%20(12)/Trees%20(10)/HLD%20(10.3).h
- * Verification: https://cses.fi/problemset/result/2321114/, https://www.spoj.com/status/QTREE,deepkamal/
-*/
- 
 //  0-indexed
 template<bool VALS_IN_EDGES> struct HLD { 
     int N;
@@ -46,9 +34,7 @@ template<bool VALS_IN_EDGES> struct HLD {
     vector<vector<int>> adj;
     vector<int> par, root, depth, sz,  pos;
     vector<int> rpos; // rpos not used, but could be useful
-    
     basic_segment_tree<node> tree; // segment tree 
-    
     void init(int _N){
         N = _N;
         adj.assign(N,{});
@@ -59,12 +45,9 @@ template<bool VALS_IN_EDGES> struct HLD {
         pos.assign(N,-1);
         tree.init(N);
     }
-    
-    
     void ae(int x, int y) { 
         adj[x].push_back(y), adj[y].push_back(x); 
     }
-    
     void dfs_sz(int x) { 
         sz[x] = 1; 
         for(auto& y : adj[x]) {
@@ -75,7 +58,6 @@ template<bool VALS_IN_EDGES> struct HLD {
             if (sz[y] > sz[adj[x][0]]) swap(y,adj[x][0]); // store the heavy child at first vertex
         }
     }
-    
     void dfs_hld(int x) {
         pos[x] = timer++; rpos.push_back(x);
         for(auto& y : adj[x]) {
@@ -83,29 +65,21 @@ template<bool VALS_IN_EDGES> struct HLD {
             dfs_hld(y); 
         }
     }
-    
-    
-    
     void gen(int R = 0) { 
         par[R] = depth[R] = timer = 0; 
         dfs_sz(R); 
         root[R] = R;
         dfs_hld(R); 
     }
-    
     int lca(int x, int y) {
         for (; root[x] != root[y]; y = par[root[y]]){
             if (depth[root[x]] > depth[root[y]]) swap(x,y);
         }
         return depth[x] < depth[y] ? x : y;
     }
-    
     int dist(int x, int y) { // # edges on path
          return depth[x] + depth[y] - 2 * depth[lca(x,y)]; 
     }
-    
-    
-    
     void process_path(int x, int y, auto op) {
         for (; root[x] != root[y]; y = par[root[y]]) {
             if (depth[root[x]] > depth[root[y]]) swap(x,y);
@@ -114,14 +88,12 @@ template<bool VALS_IN_EDGES> struct HLD {
         if (depth[x] > depth[y]) swap(x,y);
         op(pos[x]+VALS_IN_EDGES,pos[y]); 
     }
- 
     void modify_path(int x, int y, node v) { 
         process_path(x,y,[this,&v](int l, int r) {
             assert(l == r); 
             tree.upd(l,v); 
         });
     }
- 
     node query_path(int x, int y) { 
         node res = {0}; 
         process_path(x,y,[this,&res](int l, int r) { 
