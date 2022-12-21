@@ -33,7 +33,7 @@ struct AhoCorasick{
     if(ed==-1) ed=y;
     else{
      N[ed].back=y;
-     (N[ed].end==-1 ? N[ed].end:backp[N[ed].start])=N[y].end;
+     (N[ed].end==-1?N[ed].end:backp[N[ed].start])=N[y].end;
      N[ed].nmatches+=N[y].nmatches;
      q.push(ed);}}}}
  ll find(string word){

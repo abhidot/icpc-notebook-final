@@ -1,6 +1,6 @@
 #pragma GCC optimize ("-O2")
 #pragma GCC optimize("Ofast")
-// ~ #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+// ~ #pragma GCC target("sse,sse2,sse3,ssse3,sse4, popcnt,abm,mmx,avx,tune=native")
 // ~ #pragma GCC optimize("unroll-loops")
 #include <bits/stdc++.h>
 using namespace std;
@@ -13,8 +13,4 @@ using namespace std;
 #define getcurrtime() cerr<<"Time = "<<((double)clock()/CLOCKS_PER_SEC)<<endl
 #define inputfile freopen("input.txt", "r", stdin)
 #define outputfile freopen("output.txt", "w", stdout)
-typedef pair<ll,ll> p64;
-typedef pair<int,p32> p96;
-typedef vector<ll> v64;
-typedef vector<v64> vv64;
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937 rng( chrono::steady_clock::now().time_since_epoch().count());

@@ -48,8 +48,8 @@ v32 ints;
 Hull(int n){ints.clear(); forn(i,n) ints.pb(i); dq.clear();}
 // Dec order of slopes
 void add(line cur){
-  while(dq.size()>=2 && cur.intersectX(dq[0])>=dq[0].intersectX(dq[1]))
-    dq.pop_front();
+  while(dq.size()>=2 && cur.intersectX(dq[0])>=dq[0].intersectX(
+    dq[1])) dq.pop_front();
   dq.push_front(cur);}
 void add(const ll &m,const ll &c){add(line(m,c));}
 // query sorted dec.

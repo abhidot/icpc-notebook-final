@@ -52,7 +52,7 @@ template<bool VALS_IN_EDGES> struct HLD {
         sz[x] = 1; 
         for(auto& y : adj[x]) {
             par[y] = x; depth[y] = depth[x] + 1;
-            adj[y].erase(find(adj[y].begin(),adj[y].end(),x)); // remove parent from adj list
+            adj[y].erase(find(adj[y].begin() ,adj[y].end(),x)); // remove parent from adj list
             dfs_sz(y); 
             sz[x] += sz[y];
             if (sz[y] > sz[adj[x][0]]) swap(y,adj[x][0]); // store the heavy child at first vertex

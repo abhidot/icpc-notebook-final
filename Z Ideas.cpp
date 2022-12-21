@@ -59,7 +59,7 @@ int solve() {
 
 Knuth Optimization:
 
-dp[i][j] = mini < k < j{dp[i][k] + dp[k][j]} + C[i][j]
+dp[i][j] = mini < k < j {dp[i][k] + dp[k][j]} + C[i][j]
 monotonicity : C[b][c] <= C[a][d]
 quadrangle inequality: C[a][c]+C[b][d] <= C[a][d]+C[b][c]
 
@@ -192,20 +192,6 @@ Strongly Connected component and Condensation Graph:
 FFT Matrices:
 XOR FFT: 1 1 / 1 -1, AND FFT: 0 1/ 1 1, OR FFT: 1 1/ 1 0
 
-Harmonic lemma:
-for (int i = 1, la; i <= n; i = la + 1) {
-		la = n / (n / i);
-		v.pb(mp(n/i,la-i+1));}
-	//n / x yields the same value for i <= x <= la.
-
-Mobius inversion theory:
-
-if f and g are multiplicative, then their dirichlet convolution,
-i.e sum_{d|x} f(d)g(x/d) is also multiplicative. eg. choose g = 1
-Properties:
-1. If g(n) = sum_{d|n}f(d), then f(n) = sum_{d|x}g(d)u(n/d).
-2. sum_{d|n}u(d) = [n==1]
-
 Standard question: Number of co-prime integers in range 1,n
 Answer: f(n) = sum_{d = 1 to n} u(d)floor(n/d)^2
 
@@ -233,15 +219,15 @@ F(x) = sum of all A(i) such that x&i = i.
 
 //iterative version
 for(int mask = 0; mask < (1<<N); ++mask){
-	dp[mask][-1] = A[mask];	//handle base case separately (leaf states)
-	for(int i = 0;i < N; ++i){
-		if(mask & (1<<i))
-			dp[mask][i] = dp[mask][i-1] + dp[mask^(1<<i)][i-1];
-		else
-			dp[mask][i] = dp[mask][i-1];}
-	F[mask] = dp[mask][N-1];}
-	
+ dp[mask][-1] = A[mask]; //handle base case separately (leaf states)
+ for(int i = 0;i < N; ++i){
+  if(mask & (1<<i))
+   dp[mask][i] = dp[mask][i-1] + dp[mask^(1<<i)][i-1];
+  else
+   dp[mask][i] = dp[mask][i-1];}
+ F[mask] = dp[mask][N-1];}
+ 
 //memory optimized, super easy to code.
 for(int i = 0; i<(1<<N); ++i) F[i] = A[i];
 for(int i = 0;i < N; ++i) for(int mask = 0; mask < (1<<N); ++mask){
-	if(mask & (1<<i)) F[mask] += F[mask^(1<<i)];}
+ if(mask & (1<<i)) F[mask] += F[mask^(1<<i)];}

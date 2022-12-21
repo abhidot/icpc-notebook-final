@@ -33,6 +33,4 @@ struct dsu{
       par[tp]=tp;
       st.pop();
       ++sz;
-     }
-    }
-} d;
+     }}} d;

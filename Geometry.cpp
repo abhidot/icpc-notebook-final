@@ -310,7 +310,7 @@ int pAndPoly(vector<PT> pv, PT p){
    pv[n]=pv[0];
    j=0;
    for(i=0;i<n;i++) if(pv[i].x*pv[i+1].x < -EPS){
-   y=pv[i+1].y-pv[i+1].x*(pv[i].y-pv[i+1].y)/(pv[i].x-pv[i+1].x);
+   y=pv[i+1].y-pv[i+1].x*(pv[i].y-pv[i+1].y)/ (pv[i].x-pv[i+1].x);
     if(y>0) j++;}
    return(j%2);}}
  return 1;}
@@ -322,7 +322,7 @@ double maxdist(vector<PT> poly){
  double res = 0;
  for(int i = 0, j = n<2?0:1; i<j;i++){
   for(;; j = (j+1)%n){
-   res = max(res,dist(poly[i],poly[j])*dist(poly[i], poly[j]));
+   res = max(res,dist(poly[i],poly[j])*dist( poly[i],poly[j]));
    PT dummy;
    dummy.x = 0, dummy.y = 0;
    if(sideSign(dummy,poly[(j+1)%n]-poly[j],poly[i+1] -poly[i]) >= 0) break;}
