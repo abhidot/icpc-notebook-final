@@ -14,7 +14,7 @@ ll solve(ll a,ll b,ll MOD){
     cur=b;
     sort(all(vals));
     forn(i,n+1){
-    	auto in=lower_bound(all(vals),mp(cur,-1))-vals.begin();
+    	auto in=lower_bound(all(vals), mp(cur,-1))-vals.begin();
     	if(in!=vals.size() && vals[in].fi==cur){
     		ll ans=n*(ll)vals[in].se-i;
     		if(ans<MOD) return ans;}

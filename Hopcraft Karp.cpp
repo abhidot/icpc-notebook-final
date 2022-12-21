@@ -5,7 +5,7 @@ struct Hopcroft_Karp{
  int n;
  vector<int> matchL, matchR, dist;
  vector<vector<int> > g;
- Hopcroft_Karp(int n):n(n),matchL(n+1),matchR(n+1),dist(n+1),g(n+1){}
+ Hopcroft_Karp(int n):n(n),matchL(n+1),matchR(n+1), dist(n+1),g(n+1){}
  void addEdge(int u, int v){
   g[u].pb(v);}
  bool bfs(){

@@ -322,11 +322,10 @@ double maxdist(vector<PT> poly){
  double res = 0;
  for(int i = 0, j = n<2?0:1; i<j;i++){
   for(;; j = (j+1)%n){
-   res = max(res,dist(poly[i],poly[j])*dist(poly[i],poly[j]));
+   res = max(res,dist(poly[i],poly[j])*dist(poly[i], poly[j]));
    PT dummy;
    dummy.x = 0, dummy.y = 0;
-   if(sideSign(dummy,poly[(j+1)%n]-poly[j],poly[i+1]-poly[i]) >= 0) break;
-  }
+   if(sideSign(dummy,poly[(j+1)%n]-poly[j],poly[i+1] -poly[i]) >= 0) break;}
  }
  return res;
 } 

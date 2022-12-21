@@ -46,18 +46,15 @@ void compute(int l, int r, int optl, int optr) {
     dp_cur[mid] = best.first;
     int opt = best.second;
     compute(l, mid - 1, optl, opt);
-    compute(mid + 1, r, opt, optr);
-}
+    compute(mid + 1, r, opt, optr);}
 
 int solve() {
     for (int i = 0; i < n; i++)
         dp_before[i] = C(0, i);
-
     for (int i = 1; i < m; i++) {
         compute(0, n - 1, 0, n - 1);
         dp_before = dp_cur;
     }
-
     return dp_before[n - 1];}
 
 Knuth Optimization:
@@ -229,11 +226,6 @@ Counting labeled graphs:
 The total number of labelled graphs is G_n = 2^{n(n-1)/2}
 Number of connected labelled graphs is C_n = G_n - 1/n*(sum_{k = 1 to n-1} k.(nCk).C_{k}G_{n-k}
 Number of labelled graphs with k components: D[n][k] = sum_{s = 1 to n} ((n-1)C(s-1))C_{s}D[n-s][k-1]
-
-Steiner tree dp:
-
-The idea is to build a dynamic programming DP[i][m], where i is which vertex you are at and m is a bitmask of which capitals you joined. You can preprocess the APSP (Floyd-Warshall, or many Dijkstras because of the small constants) and calculate DP[i][m] like this: DP[i][m] = min(DP[i][s] + DP[j][m - s] + dist[i][j]), with s being a submask of m. In the end the complexity is O(3^k * n^2).
-To get O(3^k * n) complexity, you do 2 transitions: 1. O(3^k * n) transition using submasks and 2. O(2^k * n^2) transition, that is, O(n^2) transition for each mask.
 
 Sum of subsets DP:
 
